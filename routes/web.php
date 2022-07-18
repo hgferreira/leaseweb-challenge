@@ -2,6 +2,11 @@
 
 use Illuminate\Support\Facades\Route;
 
+
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FrontendController;
+
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -12,13 +17,13 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::get('/', [FrontendController::class, 'home'])->name('home');
+Route::post('/', [FrontendController::class, 'search'])->name('search');
 
-Route::get('/', function () {
-    return view('welcome');
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'home'])->name('dashboard');
+    Route::post('/upload', [DashboardController::class, 'upload'])->name('dashboard.upload');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth'])->name('dashboard');
 
 require __DIR__.'/auth.php';
