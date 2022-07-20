@@ -32,7 +32,7 @@ class ParseCSV
      */
     public function handle(CSVUploaded $event)
     {
-        if (($slFile = fopen(storage_path('app\public') .'\\'. config('leaseweb.sl_filename'), "r")) !== FALSE) {
+        if (($slFile = fopen(storage_path('app/public/') . config('leaseweb.sl_filename'), "r")) !== FALSE) {
 
             // clear the servers table
             Server::truncate();
