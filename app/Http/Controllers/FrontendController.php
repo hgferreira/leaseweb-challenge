@@ -17,9 +17,15 @@ class FrontendController extends Controller
 
     public function home(Request $request)
     {
+        // store requests in session between calls        
+        $request->flash();
+
+        $storageMin = Server::orderBy('storage_size', 'ASC')->limit(1)->pluck('storage_size');
+        $storageMax = Server::orderBy('storage_size', 'DESC')->limit(1)->pluck('storage_size');
+
         return view('welcome', [
-            'storageMin' => Server::orderBy('storage_size', 'ASC')->first()->pluck('storage_size'),
-            'storageMax' => Server::orderBy('storage_size', 'DESC')->first()->pluck('storage_size'),
+            'storageMin' => !empty($storageMin) && is_array($storageMin) ? $storageMin[0] : 0,
+            'storageMax' => !empty($storageMax) && is_array($storageMax) ? $storageMax[0] : 0,
             'rams' => Server::orderBy('ram_size', 'ASC')->distinct('ram_size')->get(['ram_size']),
             'locations' => Location::orderBy('location', 'ASC')->distinct('location')->get(),
             'storageTypes' => StorageType::orderBy('type', 'ASC')->get(),
@@ -29,10 +35,20 @@ class FrontendController extends Controller
 
     public function search(Request $request)
     {
+        
+
         $query = Server::select('servers.*', 'locations.location', 'locations.location_code', 'storage_types.type')
                         ->leftJoin('locations', 'servers.location_id', '=', 'locations.id')
                         ->leftJoin('storage_types', 'servers.storage_type_id', '=', 'storage_types.id');
-        
+
+        if ($request->has('storage_min') && $request->get('storage_min') > 0) {
+            $query->where('storage_size', '>=', $request->get('storage_min'));
+        }
+
+        if ($request->has('storage_max') && $request->get('storage_max') > 0) {
+            $query->where('storage_size', '<=', $request->get('storage_max'));
+        }
+
         if ($request->has('storage_type_id') && $request->get('storage_type_id') > 0) {
             $query->where('storage_type_id', $request->get('storage_type_id'));
         }

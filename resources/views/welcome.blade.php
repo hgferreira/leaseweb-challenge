@@ -1,5 +1,4 @@
 <x-guest-layout>
-{{-- @dump($storageMin, $storageMax, $rams, $locations, $storageTypes) --}}
     <form action="{{ route('search') }}" method="post" enctype="multipart/form-data">
         @csrf
         <div class="relative flex items-top justify-center min-h-screen bg-gray-100 dark:bg-gray-900 sm:items-center py-4 sm:pt-0">
@@ -29,15 +28,52 @@
                                 <div class="text-lg font-semibold">Storage</div>
                             </div>
 
-                            <div class="">
-                                <div class="mt-2 text-gray-600 dark:text-gray-400 text-sm">
-                                    <select>
-                                        <option>sdfsd</option>
-                                    </select>
+                            <div class="mt-2">
+                                <div class="relative pt-1">
+                                    <label for="storageMin" class="form-label">Storage Minimum</label>
+                                    <input
+                                        type="range"
+                                        class="
+                                        form-range
+                                        h-6
+                                        p-0
+                                        bg-transparent
+                                        focus:outline-none focus:ring-0 focus:shadow-none
+                                        "
+                                        min="0"
+                                        max="{{ $storageMax }}"
+                                        step="10"
+                                        id="storageMin"
+                                        name="storage_min"
+                                        value="{{ old('storage_min', 0) }}"
+                                    />
+                                    <div id="storageMinDisplay" class="pb-3 inline-block"></div>
                                 </div>
                             </div>
-                        </div>
 
+                            <div class="mt-2">
+                                <div class="relative pt-1">
+                                    <label for="storageMax" class="form-label">Storage Maximum</label>
+                                    <input
+                                        type="range"
+                                        class="
+                                        form-range
+                                        h-6
+                                        p-0
+                                        bg-transparent
+                                        focus:outline-none focus:ring-0 focus:shadow-none
+                                        "
+                                        min="0"
+                                        max="{{ $storageMax }}"
+                                        step="10"
+                                        id="storageMax"
+                                        name="storage_max"
+                                        value="{{ old('storage_max', 0) }}"
+                                    />
+                                    <div id="storageMaxDisplay" class="pb-3 inline-block"></div>
+                                </div>
+                            </div>
+                        </div>    
                         <div class="p-6 border-t border-gray-200 dark:border-gray-700">
                             <div class="flex items-center">
                                 <div class="text-lg font-semibold">Storage Type</div>
@@ -63,7 +99,7 @@
                             <div class="">
                             @foreach($rams as $ram)
                                 <div class="form-check form-check-inline mr-3">
-                                    <input class="form-check-input appearance-none h-4 w-4 border border-gray-300 rounded-sm bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" type="checkbox" id="inlineCheckbox{{ $loop->index }}" name="ram[]" value="{{ $ram->ram_size }}">
+                                    <input class="form-check-input appearance-none h-4 w-4 border border-gray-300 rounded-sm bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" type="checkbox" id="inlineCheckbox{{ $loop->index }}" name="ram[]" value="{{ $ram->ram_size }}" @if (in_array($ram->ram_size, old('ram') ?: [] )) checked="true" @endif>
                                     <label class="form-check-label inline-block text-gray-800" for="inlineCheckbox1">{{ $ram->ram_size }}GB</label>
                                 </div>
                             @endforeach
@@ -76,7 +112,7 @@
                             </div>
 
                             <div class="">
-                                <div class="mt-2 text-gray-600 dark:text-gray-400 text-sm">
+                                <div class="mt-2 text-gray-600 dark:text-gray-400 text-sm mr-2">
                                     <select name="location_id" id="location_id">
                                         <option value="0">-- ALL --</option>
                                     @foreach($locations as $location)
@@ -98,46 +134,67 @@
                     </div>                    
                 </div>
 
+            @if (!empty($serverList))
             <div class="px-4 sm:px-6 lg:px-8">
-            <div class="mt-8 flex flex-col">
-                <div class="-my-2 -mx-4 sm:-mx-6 lg:-mx-8">
-                <div class="inline-block min-w-full py-2 align-middle">
-                    <div class="shadow-sm ring-1 ring-black ring-opacity-5">
-                    <table class="min-w-full border-separate" style="border-spacing: 0">
-                        <thead class="bg-gray-50">
-                        <tr>
-                            <th scope="col" class="sticky top-0 z-10 border-b border-gray-300 bg-gray-50 bg-opacity-75 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter sm:pl-6 lg:pl-8">Model</th>
-                            <th scope="col" class="sticky top-0 z-10 hidden border-b border-gray-300 bg-gray-50 bg-opacity-75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter sm:table-cell">RAM</th>
-                            <th scope="col" class="sticky top-0 z-10 hidden border-b border-gray-300 bg-gray-50 bg-opacity-75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter lg:table-cell">Storage</th>
-                            <th scope="col" class="sticky top-0 z-10 border-b border-gray-300 bg-gray-50 bg-opacity-75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter">Location</th>
-                            <th scope="col" class="sticky top-0 z-10 border-b border-gray-300 bg-gray-50 bg-opacity-75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter">Price</th>
-                        </tr>
-                        </thead>
-                        <tbody class="bg-white">
-                    @foreach($serverList as $server)                          
-                        <tr>
-                            <td class="whitespace-nowrap border-b border-gray-200 py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8">{{ $server->model }}</td>
-                            <td class="whitespace-nowrap border-b border-gray-200 px-3 py-4 text-sm text-gray-500 hidden sm:table-cell">{{ $server->ram_size}}{{ $server->ram_unit}} {{ $server->ram_type}}</td>
-                            <td class="whitespace-nowrap border-b border-gray-200 px-3 py-4 text-sm text-gray-500 hidden lg:table-cell">{{ $server->storage_number}}x{{ $server->storage_size}}{{ $server->storage_unit}}&nbsp;{{ $server->type}}</td>
-                            <td class="whitespace-nowrap border-b border-gray-200 px-3 py-4 text-sm text-gray-500">{{ $server->location}}</td>
-                            <td class="whitespace-nowrap border-b border-gray-200 px-3 py-4 text-sm text-gray-500 text-right">@if ($server->currency == 'usd')${{ $server->price}}@else{{ $server->price}}&euro;@endif</td>
-                        </tr>
-                    @endforeach
-                        </tbody>
-                    </table>
+                <div class="mt-8 flex flex-col">
+                    <div class="-my-2 -mx-4 sm:-mx-6 lg:-mx-8">
+                    <div class="inline-block min-w-full py-2 align-middle">
+                        <div class="shadow-sm ring-1 ring-black ring-opacity-5">
+                        <table class="min-w-full border-separate" style="border-spacing: 0">
+                            <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="sticky top-0 z-10 border-b border-gray-300 bg-gray-50 bg-opacity-75 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter sm:pl-6 lg:pl-8">Model</th>
+                                <th scope="col" class="sticky top-0 z-10 hidden border-b border-gray-300 bg-gray-50 bg-opacity-75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter sm:table-cell">RAM</th>
+                                <th scope="col" class="sticky top-0 z-10 hidden border-b border-gray-300 bg-gray-50 bg-opacity-75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter lg:table-cell">Storage</th>
+                                <th scope="col" class="sticky top-0 z-10 border-b border-gray-300 bg-gray-50 bg-opacity-75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter">Location</th>
+                                <th scope="col" class="sticky top-0 z-10 border-b border-gray-300 bg-gray-50 bg-opacity-75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter">Price</th>
+                            </tr>
+                            </thead>
+                            <tbody class="bg-white">
+                        @foreach($serverList as $server)                          
+                            <tr>
+                                <td class="whitespace-nowrap border-b border-gray-200 py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8">{{ $server->model }}</td>
+                                <td class="whitespace-nowrap border-b border-gray-200 px-3 py-4 text-sm text-gray-500 hidden sm:table-cell">{{ $server->ram_size}}{{ $server->ram_unit}} {{ $server->ram_type}}</td>
+                                <td class="whitespace-nowrap border-b border-gray-200 px-3 py-4 text-sm text-gray-500 hidden lg:table-cell">{{ $server->storage_number}}x{{ $server->storage_size}}{{ $server->storage_unit}}&nbsp;{{ $server->type}}</td>
+                                <td class="whitespace-nowrap border-b border-gray-200 px-3 py-4 text-sm text-gray-500">{{ $server->location}}</td>
+                                <td class="whitespace-nowrap border-b border-gray-200 px-3 py-4 text-sm text-gray-500 text-right">@if ($server->currency == 'usd')${{ $server->price}}@else{{ $server->price}}&euro;@endif</td>
+                            </tr>
+                        @endforeach
+                            </tbody>
+                        </table>
+                        </div>
+                    </div>
                     </div>
                 </div>
-                </div>
             </div>
-            </div>
-
+            @endif
             </div>
         </div>
-        
-        <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">
-        <!-- This example requires Tailwind CSS v2.0+ -->
-
-        </div>    
-
     </form>
+
+<script type="text/javascript"> 
+    document.getElementById("storageMin").onclick = function() {
+        updateDisplay();
+    }
+
+    document.getElementById("storageMax").onclick = function() {
+        updateDisplay();        
+    }
+
+    function updateDisplay() {
+        if (document.getElementById("storageMin").value > 0) {
+            document.getElementById("storageMinDisplay").innerHTML = document.getElementById("storageMin").value+'GB';
+        } else {
+            document.getElementById("storageMinDisplay").innerHTML = '-- ALLL --';
+        }
+
+        if (document.getElementById("storageMax").value > 0) {
+            document.getElementById("storageMaxDisplay").innerHTML = document.getElementById("storageMax").value+'GB';
+        } else {
+            document.getElementById("storageMaxDisplay").innerHTML = '-- ALLL --';
+        }        
+    }
+
+    updateDisplay();
+</script>
 </x-guest-layout>
